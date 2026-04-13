@@ -1,0 +1,58 @@
+---
+title: "Remint 1"
+author: "KP"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+```{r libraries, include = FALSE}
+
+library(knitr)
+library(dplyr)
+
+```
+
+#### Subjects: `r N`
+
+#### Design:\
+Replikacja Semint1 z dwoma zamiast czterema dystraktorami.\
+Manipulacja długością przerwy między dystraktorami (długa vs krótka)
+
+#### Hipotezy:\
+Spodziewam się interakcji relatedness z długością: przy dłuższych przerwach efekt relatedness powinien być mniejszy
+
+## Analyses
+
+### STM
+```{r tests stm}
+# Serial accuracy ANOVA
+anova2waySTM
+plot_STM
+# Item scoring ANOVA
+anova2waySTMitem
+plot_STM_i
+
+# Serial accuracy ANOVA
+anova2waySTMserial
+plot_STM_s
+
+# Means
+STMmeans
+```
+
+### LTM
+```{r tests ltm}
+# ANOVA
+anova2wayLTM
+plot_LTM
+# Means
+LTMmeans
+```
+
+### Individual Means
+```{r}
+print(Subjects, n = nrow(Subjects))
+```
