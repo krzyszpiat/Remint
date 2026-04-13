@@ -37,104 +37,104 @@
   newData <-  0
   
   # Corrected data available? (1 = yes)
-  corrected <- 0
+  corrected <- 1
   
   # Print report? (1 = yes)
-  report <- 0
+  report <- 1
 
 
 #### IMPORTING DATA ####
-if (newData == 1) {
+if (corrected == 0) {  
+  if (newData == 1) {
+    
+    fullTable <- read.delim("Data/Untitled.txt", skip = 0, skipNul = T, fileEncoding="UCS-2LE")
+    
+    relevantTable <- fullTable %>% 
+      filter(BlockCondition %in% c("long", "short")) %>% 
+      select(Subject,
+             ProlificNo,
+             Age, 
+             Sex,
+             check.RESP,
+             BlockCondition,
+             UnrelAcc = TarRecallU.ACC.LogLevel6.,
+             RelAcc = TarRecallR.ACC,
+             TarRecallR.RESP,
+             TarRecallR.CRESP,
+             TarRecallU.RESP.LogLevel6.,
+             TarRecallU.CRESP.LogLevel6.,
+             RESP_LTM = RecallDisplay.RESP,
+             CRESP_LTM = RecallDisplay.CRESP,
+             TypeLTM = Type) %>% 
+      filter(!is.na(RelAcc) | !is.na(UnrelAcc) | CRESP_LTM != "")
+    
+    saveRDS(relevantTable, "Data/relevantTable.RDS")
   
-  fullTable <- read.delim("Untitled.txt", skip = 0, skipNul = T, fileEncoding="UCS-2LE")
+  }else{
+    
+    relevantTable <- readRDS("Data/relevantTable.RDS")
+    
+  }
   
-  relevantTable <- fullTable %>% 
-    filter(BlockCondition %in% c("long", "short")) %>% 
-    select(Subject,
-           ProlificNo,
-           Age, 
-           Sex,
-           check.RESP,
-           BlockCondition,
-           UnrelAcc = TarRecallU.ACC.LogLevel6.,
-           RelAcc = TarRecallR.ACC,
-           TarRecallR.RESP,
-           TarRecallR.CRESP,
-           TarRecallU.RESP.LogLevel6.,
-           TarRecallU.CRESP.LogLevel6.,
-           RESP_LTM = RecallDisplay.RESP,
-           CRESP_LTM = RecallDisplay.CRESP,
-           TypeLTM = Type) %>% 
-    filter(!is.na(RelAcc) | !is.na(UnrelAcc) | CRESP_LTM != "")
   
-  saveRDS(relevantTable, "Data/relevantTable.RDS")
+  table1 <- relevantTable %>%
+    # Adding 'NA' to empty cells
+    mutate(TarRecallR.RESP = ifelse(is.na(RelAcc), NA, TarRecallR.RESP),
+           TarRecallR.CRESP = ifelse(is.na(RelAcc), NA, TarRecallR.CRESP),
+           TarRecallU.RESP.LogLevel6. = ifelse(is.na(UnrelAcc), NA, TarRecallU.RESP.LogLevel6.),
+           TarRecallU.CRESP.LogLevel6. = ifelse(is.na(UnrelAcc), NA, TarRecallU.CRESP.LogLevel6.),
+    # Adding "TypeSTM column
+           TypeSTM = case_when(
+             !is.na(UnrelAcc) ~ "Unrelated",
+             !is.na(RelAcc) ~ "Related"),
+    # Merging Related and Unrelated columns together 
+           RESP_STM = coalesce(TarRecallR.RESP, TarRecallU.RESP.LogLevel6.),
+           CRESP_STM = coalesce(TarRecallR.CRESP, TarRecallU.CRESP.LogLevel6.)
+    ) %>% 
+    # Removing redundant columns
+    select(-c(UnrelAcc, 
+              RelAcc, 
+              TarRecallR.RESP,
+              TarRecallR.CRESP,
+              TarRecallU.RESP.LogLevel6.,
+              TarRecallU.CRESP.LogLevel6.)
+    ) 
+  
+  
+  # Removing superfluous characters from the inputs 
+  table1 <- table1 %>%  
+    mutate(nWords = str_count(RESP_STM, "SPACE") + 1,
+           CRESP_STM = str_remove(CRESP_STM, "\\{ENTER\\}"),
+           RESP_STM = str_remove_all(RESP_STM, 
+          "\\{ENTER\\}|\\{SHIFT\\}|\\{CAPSLOCK\\}|\\{LEFTARROW\\}|\\{\\?\\}|\\{CONTROL\\}|\\{RIGHTARROW\\}|\\{UPARROW\\}|\\{ALT\\}|\\{INSERT\\}"
+           ),
+           CRESP_LTM = str_remove_all(CRESP_LTM, "\\{ENTER\\}"),
+           RESP_LTM = str_remove_all(RESP_LTM, 
+          "\\{ENTER\\}|\\{SHIFT\\}|\\{CAPSLOCK\\}|\\{LEFTARROW\\}|\\{\\?\\}|\\{CONTROL\\}|\\{RIGHTARROW\\}|\\{UPARROW\\}|\\{ALT\\}|\\{INSERT\\}|\\{SPACE\\}"
+           )
+    )
+  
+  
+  # Breaking up the inputs into separate columns for each serial position
+  table2 <- table1 %>% 
+    separate(col = RESP_STM, 
+             into = paste0("RESP", 1:max(table1$nWords, na.rm = TRUE)),
+             sep = "{SPACE}") %>% 
+    separate(col = CRESP_STM, 
+             into = paste0("CRESP", 1:4),
+             sep = "{SPACE}"
+    )
+  
+  # saving the file for manual corrections
+  write.csv(table2, "Data/tbl2.csv")
 
 }else{
-  
-  relevantTable <- readRDS("Data/relevantTable.RDS")
-  
-}
-
-#### DATA TRANSFORMATION ####
-
-table1 <- relevantTable %>%
-  # Adding 'NA' to empty cells
-  mutate(TarRecallR.RESP = ifelse(is.na(RelAcc), NA, TarRecallR.RESP),
-         TarRecallR.CRESP = ifelse(is.na(RelAcc), NA, TarRecallR.CRESP),
-         TarRecallU.RESP.LogLevel6. = ifelse(is.na(UnrelAcc), NA, TarRecallU.RESP.LogLevel6.),
-         TarRecallU.CRESP.LogLevel6. = ifelse(is.na(UnrelAcc), NA, TarRecallU.CRESP.LogLevel6.),
-  # Adding "TypeSTM column
-         TypeSTM = case_when(
-           !is.na(UnrelAcc) ~ "Unrelated",
-           !is.na(RelAcc) ~ "Related"),
-  # Merging Related and Unrelated columns together 
-         RESP_STM = coalesce(TarRecallR.RESP, TarRecallU.RESP.LogLevel6.),
-         CRESP_STM = coalesce(TarRecallR.CRESP, TarRecallU.CRESP.LogLevel6.)
-  ) %>% 
-  # Removing redundant columns
-  select(-c(UnrelAcc, 
-            RelAcc, 
-            TarRecallR.RESP,
-            TarRecallR.CRESP,
-            TarRecallU.RESP.LogLevel6.,
-            TarRecallU.CRESP.LogLevel6.)
-  ) 
-
-
-# Removing superfluous characters from the inputs 
-table1 <- table1 %>%  
-  mutate(nWords = str_count(RESP_STM, "SPACE") + 1,
-         CRESP_STM = str_remove(CRESP_STM, "\\{ENTER\\}"),
-         RESP_STM = str_remove_all(RESP_STM, 
-        "\\{ENTER\\}|\\{SHIFT\\}|\\{CAPSLOCK\\}|\\{LEFTARROW\\}|\\{\\?\\}|\\{CONTROL\\}|\\{RIGHTARROW\\}|\\{UPARROW\\}|\\{ALT\\}|\\{INSERT\\}"
-         ),
-         CRESP_LTM = str_remove_all(CRESP_LTM, "\\{ENTER\\}"),
-         RESP_LTM = str_remove_all(RESP_LTM, 
-        "\\{ENTER\\}|\\{SHIFT\\}|\\{CAPSLOCK\\}|\\{LEFTARROW\\}|\\{\\?\\}|\\{CONTROL\\}|\\{RIGHTARROW\\}|\\{UPARROW\\}|\\{ALT\\}|\\{INSERT\\}|\\{SPACE\\}"
-         )
-  )
-
-
-# Breaking up the inputs into separate columns for each serial position
-table2 <- table1 %>% 
-  separate(col = RESP_STM, 
-           into = paste0("RESP", 1:max(table1$nWords, na.rm = TRUE)),
-           sep = "{SPACE}") %>% 
-  separate(col = CRESP_STM, 
-           into = paste0("CRESP", 1:4),
-           sep = "{SPACE}"
-  )
-
-
-if (corrected == 1) {
   
   # read the file with corrected outputs
+  table2 <- read.csv("Data/tbl2_corrected.csv", sep = ";")
   
-}else{
-   # save the file for manual corrections
-  write.csv(table2, "tbl2.csv")
+}  
   
-}
 
 #### ACCURACY CALCULATION ####
 
@@ -156,7 +156,7 @@ table3 <- table2 %>%
           RESP3 %in% c(CRESP1, CRESP2, CRESP3, CRESP4) +
           RESP4 %in% c(CRESP1, CRESP2, CRESP3, CRESP4)
       )/4,
-  # Calculating STM Serial Memory
+  # Calculating STM Serial Memory (conditionalized)
     AccuracySTMSerial = ifelse(AccuracySTM == 0, 0, AccuracySTM/AccuracySTMItem),
   # Transforming variables into factors
     Subject = factor(Subject),
