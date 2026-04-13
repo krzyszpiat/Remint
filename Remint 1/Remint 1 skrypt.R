@@ -33,14 +33,14 @@
 
 #### SCRIPT VARIABLES ####
 
-  # NEW DATA? (1 = yes)
-  newData <-  0
-  
   # Corrected data available? (1 = yes)
   corrected <- 1
   
+  # New data collected? (1 = yes)
+  newData <-  0
+  
   # Print report? (1 = yes)
-  report <- 1
+  report <- 0
 
 
 #### IMPORTING DATA ####
@@ -132,6 +132,7 @@ if (corrected == 0) {
   
   # read the file with corrected outputs
   table2 <- read.csv("Data/tbl2_corrected.csv", sep = ";")
+  
   
 }  
   
