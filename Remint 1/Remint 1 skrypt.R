@@ -61,11 +61,11 @@ if (newData == 1) {
            TypeLTM = Type) %>% 
     filter(!is.na(RelAcc) | !is.na(UnrelAcc) | CRESP_LTM != "")
   
-  write.csv(relevantTable, "relevant-data.csv")
+  saveRDS(relevantTable, "Data/relevantTable.RDS")
 
 }else{
   
-  relevantTable <- read.csv("relevant-data.csv") %>% select(-X)
+  relevantTable <- readRDS("Data/relevantTable.RDS")
   
 }
 
