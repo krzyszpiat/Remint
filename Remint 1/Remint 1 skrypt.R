@@ -10,25 +10,31 @@
   rm(list=ls())
   Sys.setenv(LANG = "en")
   
-  # load libraries
-  library(dplyr)
-  library(tidyr)
-  library(stringr)
-  library(rstatix)
-  library(BayesFactor)
-  library(ggplot2)
-  
   # set working directory to current file's directory
   setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
   
   # load custom functions
   source("Functions/printReport.R")
+  source("Functions/libs.R")
+  
+  
+  # load libraries
+  libraries <- c(
+    "dplyr",
+    "tidyr",
+    "stringr",
+    "rstatix",
+    "BayesFactor",
+    "ggplot2")
+  
+  libs(libraries)
+  rm(libraries)
 
 
 #### SCRIPT VARIABLES ####
 
   # NEW DATA? (1 = yes)
-  newData <-  1
+  newData <-  0
   
   # Corrected data available? (1 = yes)
   corrected <- 0
