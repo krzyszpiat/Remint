@@ -22,19 +22,19 @@
   setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
   
   # load custom functions
-  source("printReport.R")
+  source("Functions/printReport.R")
 
 
 #### SCRIPT VARIABLES ####
 
   # NEW DATA? (1 = yes)
-  newData <-  0
+  newData <-  1
   
   # Corrected data available? (1 = yes)
   corrected <- 0
   
   # Print report? (1 = yes)
-  report <- 1
+  report <- 0
 
 
 #### IMPORTING DATA ####
@@ -69,7 +69,6 @@ if (newData == 1) {
   
 }
 
-
 #### DATA TRANSFORMATION ####
 
 table1 <- relevantTable %>%
@@ -85,7 +84,7 @@ table1 <- relevantTable %>%
   # Merging Related and Unrelated columns together 
          RESP_STM = coalesce(TarRecallR.RESP, TarRecallU.RESP.LogLevel6.),
          CRESP_STM = coalesce(TarRecallR.CRESP, TarRecallU.CRESP.LogLevel6.)
-  )%>% 
+  ) %>% 
   # Removing redundant columns
   select(-c(UnrelAcc, 
             RelAcc, 
@@ -113,7 +112,7 @@ table1 <- table1 %>%
 # Breaking up the inputs into separate columns for each serial position
 table2 <- table1 %>% 
   separate(col = RESP_STM, 
-           into = paste0("RESP", 1:max(table1$nWords, na.rm = T)),
+           into = paste0("RESP", 1:max(table1$nWords, na.rm = TRUE)),
            sep = "{SPACE}") %>% 
   separate(col = CRESP_STM, 
            into = paste0("CRESP", 1:4),
