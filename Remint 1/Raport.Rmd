@@ -22,7 +22,7 @@ Replikacja Semint1 z dwoma zamiast czterema dystraktorami.\
 Manipulacja długością przerwy między dystraktorami (długa vs krótka)
 
 #### Hipotezy:\
-Spodziewam się interakcji relatedness z długością: przy dłuższych przerwach efekt relatedness powinien być mniejszy
+Spodziewamy się interakcji relatedness z długością: przy dłuższych przerwach efekt relatedness powinien być mniejszy
 
 ## Analyses
 

@@ -1,11 +1,5 @@
 #### SETUP ####
 
-# NOTE: 
-# Żeby odpalić skrypt zapisz wszystkie pliki w jednym folderze,
-# zainstaluj wszystkie potrzebne biblioteki,
-# i naciśnij CTRL + SHIFT + ENTER
-
-
   # clear environment & change language to english
   rm(list=ls())
   Sys.setenv(LANG = "en")
@@ -40,7 +34,7 @@
   newData <-  0
   
   # Print report? (1 = yes)
-  report <- 0
+  report <- 1
 
 
 #### IMPORTING DATA ####
@@ -197,9 +191,22 @@ tableSTM <- table3 %>%
 # Calculating mean accuracy by condition for the whole sample
 STMmeans <- tableSTM %>% 
   group_by(BlockCondition, TypeSTM) %>% 
-  summarise(meanAccuracy = mean(meanAccuracy), 
-            meanSerial = mean(meanSerial, na.rm = T),
-            meanItem = mean(meanItem, na.rm = T))
+  summarise(mean = mean(meanAccuracy, na.rm = T),
+            sd = sd(meanAccuracy),
+            se = sd/sqrt(N-1))
+
+
+STMmeans_i <- tableSTM %>% 
+  group_by(BlockCondition, TypeSTM) %>% 
+  summarise(mean = mean(meanItem, na.rm = T),
+            sd = sd(meanItem),
+            se = sd/sqrt(N-1))
+
+STMmeans_s <- tableSTM %>% 
+  group_by(BlockCondition, TypeSTM) %>% 
+  summarise(mean = mean(meanSerial, na.rm = T),
+            sd = sd(meanSerial),
+            se = sd/sqrt(N-1))
 
 
 # 2-way anova: raw accuracy
@@ -218,20 +225,23 @@ anova2waySTMitem <- anova_test(tableSTM, dv = meanItem, wid = Subject, within = 
 
 # Generating plots
 plot_STM <- STMmeans %>% 
-  ggplot(aes(BlockCondition, meanAccuracy, color = TypeSTM)) +
-  geom_line(aes(group=TypeSTM), linewidth = 2) +
+  ggplot(aes(BlockCondition, mean)) +
+  geom_line(aes(group=TypeSTM, color = TypeSTM), linewidth = 2) +
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = .1) +
   ggtitle("STM: raw accuracy") +
   ylim(.5,1)
 
-plot_STM_s <- STMmeans %>% 
-  ggplot(aes(BlockCondition, meanSerial, color = TypeSTM)) +
-  geom_line(aes(group=TypeSTM), linewidth = 2) +
+plot_STM_s <- STMmeans_s %>% 
+  ggplot(aes(BlockCondition, mean)) +
+  geom_line(aes(group=TypeSTM, color = TypeSTM), linewidth = 2) +
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = .1) +
   ggtitle("STM: serial memory") +
   ylim(.5,1)
 
-plot_STM_i <- STMmeans %>% 
-  ggplot(aes(BlockCondition, meanItem, color = TypeSTM)) +
-  geom_line(aes(group=TypeSTM), linewidth = 2) +
+plot_STM_i <- STMmeans_i %>% 
+  ggplot(aes(BlockCondition, mean)) +
+  geom_line(aes(group=TypeSTM, color = TypeSTM), linewidth = 2) +
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = .1) +
   ggtitle("STM: item memory") +
   ylim(.5,1)
 
@@ -255,7 +265,9 @@ tableLTM <- table3 %>%
 # Calculating mean accuracy by condition for the whole sample
 LTMmeans <- tableLTM %>% 
   group_by(BlockCondition, TypeLTM) %>% 
-  summarise(meanAccuracy = mean(meanAccuracy))
+  summarise(mean = mean(meanAccuracy),
+            sd = sd(meanAccuracy),
+            se = sd/sqrt(N-1))
 
 
 # 2-way anova
@@ -274,9 +286,10 @@ anovaBF(meanAccuracy ~ TypeLTM * BlockCondition + Subject,
 
 # Generating plots
 plot_LTM <- LTMmeans %>% 
-  ggplot(aes(BlockCondition, meanAccuracy, color = TypeLTM)) +
-  geom_line(aes(group=TypeLTM), linewidth = 2) +
-  ggtitle("STM: raw accuracy") +
+  ggplot(aes(BlockCondition, mean)) +
+  geom_line(aes(group=TypeLTM, color = TypeLTM), linewidth = 2) +
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = .1) +
+  ggtitle("LTM: raw accuracy") +
   ylim(.3,.8)
 
 
