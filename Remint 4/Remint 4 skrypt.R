@@ -214,7 +214,7 @@ STMmeans_s <- tableSTM %>%
             sd = sd(meanSerial),
             se = sd/sqrt(N-1))
 
-ylim <- c(0,1)
+limits <- c(0,1)
 
 
 if (both == 1) {
@@ -238,21 +238,21 @@ if (both == 1) {
     geom_line(aes(group=TypeSTM, color = TypeSTM), linewidth = 2) +
     geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = .1) +
     ggtitle("STM: raw accuracy") +
-    ylim(ylim)
+    ylim(limits)
   
   plot_STM_s <- STMmeans_s %>% 
     ggplot(aes(BlockCondition, mean)) +
     geom_line(aes(group=TypeSTM, color = TypeSTM), linewidth = 2) +
     geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = .1) +
     ggtitle("STM: serial memory") +
-    ylim(ylim)
+    ylim(limits)
   
   plot_STM_i <- STMmeans_i %>% 
     ggplot(aes(BlockCondition, mean)) +
     geom_line(aes(group=TypeSTM, color = TypeSTM), linewidth = 2) +
     geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = .1) +
     ggtitle("STM: item memory") +
-    ylim(ylim)
+    ylim(limits)
   
   #plot_STM
   #plot_STM_s
@@ -266,7 +266,7 @@ mPlot_STM <- STMmeans %>%
   geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = .1) +
   scale_fill_manual(values = c("#E15759", "#4E79A7")) +
   ggtitle("STM: raw accuracy") +
-  ylim(ylim)
+  ylim(limits)
 
 mPlot_STM_i <- STMmeans_i %>% 
   ggplot(aes(TypeSTM, mean)) +
@@ -274,7 +274,7 @@ mPlot_STM_i <- STMmeans_i %>%
   geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = .1) +
   scale_fill_manual(values = c("#E15759", "#4E79A7")) +
   ggtitle("STM: item memory") +
-  ylim(ylim)
+  ylim(limits)
 
 mPlot_STM_s <- STMmeans_s %>% 
   ggplot(aes(TypeSTM, mean)) +
@@ -282,11 +282,11 @@ mPlot_STM_s <- STMmeans_s %>%
   geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = .1) +
   scale_fill_manual(values = c("#E15759", "#4E79A7")) +
   ggtitle("STM: serial memory") +
-  ylim(ylim)
+  ylim(limits)
 
-#mPlot_STM
-#mPlot_STM_i
-#mPlot_STM_s
+  #mPlot_STM
+  #mPlot_STM_i
+  #mPlot_STM_s
 
 #### LTM: ANALYSES & PLOTS ####
 
@@ -324,7 +324,7 @@ if (both == 1) {
     geom_line(aes(group=TypeLTM, color = TypeLTM), linewidth = 2) +
     geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = .1) +
     ggtitle("LTM: raw accuracy") +
-    ylim(ylim)
+    ylim(limits)
   
   
   #plot_LTM
@@ -337,11 +337,13 @@ mPlot_LTM <- LTMmeans %>%
   geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = .1) +
   scale_fill_manual(values = c("#E15759", "#4E79A7")) +
   ggtitle("LTM") +
-  ylim(ylim)
+  ylim(limits)
 
-#mPlot_LTM
+  #mPlot_LTM
 
 #### PRINT REPORT ####
+
+# Prepare info for the report
 config <- list(both = both, 
                N = N)
 
@@ -352,9 +354,11 @@ vars <- list(
   mPlot_LTM = mPlot_LTM
 )
 
-for (name in names(vars)) {
-  saveRDS(vars[[name]], file = paste0("Outputs/", name, ".rds"))
+for (v in names(vars)) {
+  saveRDS(vars[[v]], file = paste0("Outputs/", v, ".rds"))
 }
+
+rm(vars, config)
 
 
 # Run custom function
