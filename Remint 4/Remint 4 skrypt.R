@@ -139,7 +139,7 @@ if (corrected == 0) {
 #### ACCURACY CALCULATION ####
 
 table3 <- table2 %>%
-#  rowwise() %>% 
+  rowwise() %>% 
   # Calculating LTM accuracy
   mutate(AccuracyLTM = case_when(
     is.na(nWords) ~ as.integer(RESP_LTM == CRESP_LTM)),
