@@ -3,8 +3,8 @@ title: "Remint 4"
 author: "KP"
 date: "`r Sys.Date()`"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 
@@ -12,6 +12,9 @@ output:
 
 library(knitr)
 library(dplyr)
+
+N <- readRDS("Outputs/config.RDS")$N
+both <- readRDS("Outputs/config.RDS")$both
 
 ```
 
@@ -35,6 +38,8 @@ library(dplyr)
 ### STM
 ```{r tests stm}
 
+mPlot_STM <- readRDS("Outputs/mPlot_STM.RDS")
+
 if (both == 1) {
 
   # Serial accuracy ANOVA
@@ -56,6 +61,8 @@ mPlot_STM
 
 ### LTM
 ```{r tests ltm}
+mPlot_LTM <- readRDS("Outputs/mPlot_LTM.RDS")
+
 if (both == 1) {
 
   # ANOVA
@@ -70,5 +77,6 @@ mPlot_LTM
 
 ### Individual Means
 ```{r}
+Subjects <- readRDS("Outputs/Subjects.RDS")
 print(Subjects, n = nrow(Subjects))
 ```

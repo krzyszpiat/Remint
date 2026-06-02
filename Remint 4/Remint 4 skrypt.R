@@ -342,6 +342,20 @@ mPlot_LTM <- LTMmeans %>%
 #mPlot_LTM
 
 #### PRINT REPORT ####
+config <- list(both = both, 
+               N = N)
+
+vars <- list(
+  config = config,
+  Subjects = Subjects,
+  mPlot_STM = mPlot_STM,
+  mPlot_LTM = mPlot_LTM
+)
+
+for (name in names(vars)) {
+  saveRDS(vars[[name]], file = paste0("Outputs/", name, ".rds"))
+}
+
 
 # Run custom function
 printReport(report)
