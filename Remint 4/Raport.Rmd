@@ -17,12 +17,18 @@ library(dplyr)
 
 #### Subjects: `r N`
 
-#### Design:\
-Replikacja Semint1 z dwoma zamiast czterema dystraktorami.\
-Manipulacja długością przerwy między dystraktorami (długa vs krótka)
+#### Design:
+- Replikacja Remint1 z czterema zamiast dwoma dystraktorami.
+- Manipulacja (BETWEEN PARTICIPANTS) długością przerwy między dystraktorami (długa vs krótka)
+- Badanie z anglojęzycznnymi bodźcami
 
-#### Hipotezy:\
-Spodziewamy się interakcji relatedness z długością: przy dłuższych przerwach efekt relatedness powinien być mniejszy
+#### Hipotezy:
+##### **vanilla SOB-CS:**
+- Spodziewamy się interakcji relatedness z długością: przy dłuższych przerwach efekt relatedness powinien być mniejszy\
+
+##### **z perspektywy Remint 1:**
+- Chcemy zobaczyć lepszą pamięć przy related distraction w miarach STM i LTM
+- Spodziewamy się BRAKU interakcji między długością przerwy a rodzajem dystrakcji
 
 ## Analyses
 
@@ -45,7 +51,7 @@ if (both == 1) {
 }
 
 # Means
-STMmeans
+mPlot_STM
 ```
 
 ### LTM
@@ -59,7 +65,7 @@ if (both == 1) {
 }
 
 # Means
-LTMmeans
+mPlot_LTM
 ```
 
 ### Individual Means
