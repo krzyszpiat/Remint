@@ -51,6 +51,8 @@ if (corrected == 0) {
       map(\(file) read.delim(file, skip = 0, skipNul = TRUE, fileEncoding = "UCS-2LE")) %>% 
       list_rbind()
     
+    saveRDS(fullTable, "Data/fullTable.RDS")
+    
     relevantTable <- fullTable %>% 
       filter(BlockCondition %in% c("long", "short")) %>% 
       select(Subject,
@@ -143,9 +145,15 @@ if (corrected == 0) {
 
 table3 <- table2 %>%
   rowwise() %>% 
+  mutate(
+    Subject = case_when(
+      BlockCondition == "short" ~ paste0(Subject, "S"),
+      BlockCondition == "long" ~ paste0(Subject, "L")
+    ),
   # Calculating LTM accuracy
-  mutate(AccuracyLTM = case_when(
-    is.na(nWords) ~ as.integer(RESP_LTM == CRESP_LTM)),
+      AccuracyLTM = case_when(
+      is.na(nWords) ~ as.integer(RESP_LTM == CRESP_LTM)
+      ),
   # Calculating STM Serial Score
     AccuracySTM = (
        ifelse(is.na(RESP1 == CRESP1), 0, RESP1 == CRESP1) +
@@ -204,6 +212,12 @@ STMmeans <- tableSTM %>%
             sd = sd(meanAccuracy),
             se = sd/sqrt(N-1))
 
+STMmeansGrouped <- tableSTM %>% 
+  group_by(TypeSTM) %>% 
+  summarise(mean = mean(meanAccuracy, na.rm = T),
+            sd = sd(meanAccuracy),
+            se = sd/sqrt(N-1))
+
 
 STMmeans_i <- tableSTM %>% 
   group_by(BlockCondition, TypeSTM) %>% 
@@ -211,8 +225,20 @@ STMmeans_i <- tableSTM %>%
             sd = sd(meanItem),
             se = sd/sqrt(N-1))
 
+STMmeansGrouped_i <- tableSTM %>% 
+  group_by(TypeSTM) %>% 
+  summarise(mean = mean(meanItem, na.rm = T),
+            sd = sd(meanItem),
+            se = sd/sqrt(N-1))
+
 STMmeans_s <- tableSTM %>% 
   group_by(BlockCondition, TypeSTM) %>% 
+  summarise(mean = mean(meanSerial, na.rm = T),
+            sd = sd(meanSerial),
+            se = sd/sqrt(N-1))
+
+STMmeansGrouped_s <- tableSTM %>% 
+  group_by(TypeSTM) %>% 
   summarise(mean = mean(meanSerial, na.rm = T),
             sd = sd(meanSerial),
             se = sd/sqrt(N-1))
@@ -275,7 +301,7 @@ if (both == 1) {
 
 }
 
-mPlot_STM <- STMmeans %>% 
+mPlot_STM <- STMmeansGrouped %>% 
   ggplot(aes(TypeSTM, mean)) +
   geom_col(aes(fill = TypeSTM)) +
   geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = .1) +
@@ -283,7 +309,7 @@ mPlot_STM <- STMmeans %>%
   ggtitle("STM: raw accuracy") +
   ylim(limits)
 
-mPlot_STM_i <- STMmeans_i %>% 
+mPlot_STM_i <- STMmeansGrouped_i %>% 
   ggplot(aes(TypeSTM, mean)) +
   geom_col(aes(fill = TypeSTM)) +
   geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = .1) +
@@ -291,7 +317,7 @@ mPlot_STM_i <- STMmeans_i %>%
   ggtitle("STM: item memory") +
   ylim(limits)
 
-mPlot_STM_s <- STMmeans_s %>% 
+mPlot_STM_s <- STMmeansGrouped_s %>% 
   ggplot(aes(TypeSTM, mean)) +
   geom_col(aes(fill = TypeSTM)) +
   geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = .1) +
@@ -328,6 +354,14 @@ LTMmeans <- tableLTM %>%
             se = sd/sqrt(N-1))
 
 
+LTMmeansGrouped <- tableLTM %>% 
+  group_by(TypeLTM) %>% 
+  summarise(mean = mean(meanAccuracy),
+            sd = sd(meanAccuracy),
+            se = sd/sqrt(N-1))
+
+
+
 if (both == 1) {
   
   # 2-way anova
@@ -353,7 +387,7 @@ if (both == 1) {
 
 }
 
-mPlot_LTM <- LTMmeans %>% 
+mPlot_LTM <- LTMmeansGrouped %>% 
   ggplot(aes(TypeLTM, mean)) +
   geom_col(aes(fill = TypeLTM)) +
   geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = .1) +
