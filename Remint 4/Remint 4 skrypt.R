@@ -18,6 +18,7 @@
   libraries <- c(
     "dplyr",
     "tidyr",
+    "purrr",
     "stringr",
     "rstatix",
     "BayesFactor",
@@ -46,7 +47,9 @@
 if (corrected == 0) {  
   if (newData == 1) {
     
-    fullTable <- read.delim("Data/Untitled.txt", skip = 0, skipNul = T, fileEncoding="UCS-2LE")
+    fullTable <- list.files("Data/Raw", pattern = "\\.txt$", full.names = TRUE) %>% 
+      map(\(file) read.delim(file, skip = 0, skipNul = TRUE, fileEncoding = "UCS-2LE")) %>% 
+      list_rbind()
     
     relevantTable <- fullTable %>% 
       filter(BlockCondition %in% c("long", "short")) %>% 
