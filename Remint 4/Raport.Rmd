@@ -3,8 +3,8 @@ title: "Remint 4"
 author: "KP"
 date: "`r Sys.Date()`"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 
@@ -36,47 +36,59 @@ both <- readRDS("Outputs/config.RDS")$both
 ## Analyses
 
 ### STM
-```{r tests stm}
-
-mPlot_STM <- readRDS("Outputs/mPlot_STM.RDS")
-
-if (both == 1) {
-
-  # Serial accuracy ANOVA
-  anova2waySTM
-  plot_STM
-  # Item scoring ANOVA
-  anova2waySTMitem
-  plot_STM_i
-  
-  # Serial accuracy ANOVA
-  anova2waySTMserial
-  plot_STM_s
-
-}
-
-# Means
+#### Relatedness effect
+```{r STM_means, echo = FALSE}
+mPlot_STM <- readRDS("Outputs/analyses.RDS")$mPlot_STM
 mPlot_STM
 ```
 
+#### Two-way Anovas
+```{r, echo = FALSE, eval = (both == 1)}
+# Serial accuracy ANOVA
+plot_STM <- readRDS("Outputs/analyses.RDS")$plot_STM
+anova2waySTM <- readRDS("Outputs/analyses.RDS")$anova2waySTM
+
+plot_STM
+anova2waySTM
+```
+
+```{r, echo = FALSE, eval = (both == 1)}
+# Item scoring ANOVA
+plot_STM_i <- readRDS("Outputs/analyses.RDS")$plot_STM_i
+anova2waySTMitem <- readRDS("Outputs/analyses.RDS")$anova2waySTMitem
+
+plot_STM_i
+anova2waySTMitem
+```
+
+```{r, echo = FALSE, eval = (both == 1)}
+# Serial accuracy ANOVA
+plot_STM_s <- readRDS("Outputs/analyses.RDS")$plot_STM_s
+anova2waySTMserial <- readRDS("Outputs/analyses.RDS")$anova2waySTMserial
+
+plot_STM_s
+anova2waySTMserial
+```
+
+
 ### LTM
-```{r tests ltm}
-mPlot_LTM <- readRDS("Outputs/mPlot_LTM.RDS")
-
-if (both == 1) {
-
-  # ANOVA
-  anova2wayLTM
-  plot_LTM
-
-}
-
-# Means
+#### Relatedness effect
+```{r, echo = FALSE}
+mPlot_LTM <- readRDS("Outputs/analyses.RDS")$mPlot_LTM
 mPlot_LTM
 ```
 
+#### Two-way Anova
+```{r, echo = FALSE, eval = (both == 1)}
+plot_LTM <- readRDS("Outputs/analyses.RDS")$plot_LTM
+anova2wayLTM <- readRDS("Outputs/analyses.RDS")$anova2wayLTM
+
+plot_LTM
+anova2wayLTM
+```
+
 ### Individual Means
-```{r}
+```{r, echo = FALSE}
 Subjects <- readRDS("Outputs/Subjects.RDS")
 print(Subjects, n = nrow(Subjects))
 ```

@@ -31,7 +31,7 @@
 #### SCRIPT VARIABLES ####
   
   # Both conditions? (1 = yes)
-  both <- 0
+  both <- 1
 
   # Corrected data available? (1 = yes)
   corrected <- 0
@@ -226,14 +226,23 @@ if (both == 1) {
   anova2waySTM <- anova_test(tableSTM, 
                              dv = meanAccuracy, 
                              wid = Subject, 
-                             within = c(BlockCondition, TypeSTM))
+                             within = TypeSTM,
+                             between = BlockCondition)
   
   
   # 2-way anova: serial memory
-  anova2waySTMserial <- anova_test(tableSTM, dv = meanSerial, wid = Subject, within = c(BlockCondition, TypeSTM))
+  anova2waySTMserial <- anova_test(tableSTM, 
+                                   dv = meanSerial, 
+                                   wid = Subject, 
+                                   within = TypeSTM,
+                                   between = BlockCondition)
   
   # 2-way anova: item memory
-  anova2waySTMitem <- anova_test(tableSTM, dv = meanItem, wid = Subject, within = c(BlockCondition, TypeSTM))
+  anova2waySTMitem <- anova_test(tableSTM, 
+                                 dv = meanItem, 
+                                 wid = Subject, 
+                                 within = TypeSTM,
+                                 between = BlockCondition)
 
   # Generating plots
   plot_STM <- STMmeans %>% 
@@ -319,7 +328,13 @@ LTMmeans <- tableLTM %>%
 if (both == 1) {
   
   # 2-way anova
-  anova2wayLTM <- anova_test(tableLTM, dv = meanAccuracy, wid = Subject, within = c(BlockCondition, TypeLTM))
+  anova2wayLTM <- anova_test(tableLTM, 
+                             dv = meanAccuracy, 
+                             wid = Subject, 
+                             within = TypeLTM,
+                             between = BlockCondition)
+    
+
   
   # Generating plots
   plot_LTM <- LTMmeans %>% 
@@ -350,11 +365,23 @@ mPlot_LTM <- LTMmeans %>%
 config <- list(both = both, 
                N = N)
 
+analyses <- list(
+  plot_STM = plot_STM,
+  anova2waySTM = anova2waySTM,
+  plot_STM_i = plot_STM_i,
+  anova2waySTMitem = anova2waySTMitem,
+  plot_STM_s = plot_STM_s,
+  anova2waySTMserial = anova2waySTMserial,
+  plot_LTM = plot_LTM,
+  anova2wayLTM = anova2wayLTM,
+  mPlot_STM = mPlot_STM,
+  mPlot_LTM = mPlot_LTM
+)
+
 vars <- list(
   config = config,
   Subjects = Subjects,
-  mPlot_STM = mPlot_STM,
-  mPlot_LTM = mPlot_LTM
+  analyses = analyses
 )
 
 for (v in names(vars)) {
@@ -366,4 +393,3 @@ rm(vars, config)
 
 # Run custom function
 printReport(report)
-
