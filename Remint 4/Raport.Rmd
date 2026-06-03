@@ -7,14 +7,32 @@ output:
   pdf_document: default
 ---
 
-
-```{r libraries, include = FALSE}
+```{r setup, include = FALSE}
 
 library(knitr)
 library(dplyr)
 
-N <- readRDS("Outputs/config.RDS")$N
+independent <- 0 # knitting without the main script? (1 = yes)
+
 both <- readRDS("Outputs/config.RDS")$both
+```
+
+```{r data upload, echo = FALSE, eval = (independent == 1)}
+N <- readRDS("Outputs/config.RDS")$N
+
+Subjects <- readRDS("Outputs/Subjects.RDS")
+
+mPlot_STM <- readRDS("Outputs/analyses.RDS")$mPlot_STM
+plot_STM <- readRDS("Outputs/analyses.RDS")$plot_STM
+anova2waySTM <- readRDS("Outputs/analyses.RDS")$anova2waySTM
+plot_STM_i <- readRDS("Outputs/analyses.RDS")$plot_STM_i
+anova2waySTMitem <- readRDS("Outputs/analyses.RDS")$anova2waySTMitem
+plot_STM_s <- readRDS("Outputs/analyses.RDS")$plot_STM_s
+anova2waySTMserial <- readRDS("Outputs/analyses.RDS")$anova2waySTMserial
+mPlot_LTM <- readRDS("Outputs/analyses.RDS")$mPlot_LTM
+plot_LTM <- readRDS("Outputs/analyses.RDS")$plot_LTM
+anova2wayLTM <- readRDS("Outputs/analyses.RDS")$anova2wayLTM
+
 
 ```
 
@@ -36,59 +54,56 @@ both <- readRDS("Outputs/config.RDS")$both
 ## Analyses
 
 ### STM
-#### Relatedness effect
+#### **Relatedness effect**
 ```{r STM_means, echo = FALSE}
-mPlot_STM <- readRDS("Outputs/analyses.RDS")$mPlot_STM
 mPlot_STM
 ```
 
-#### Two-way Anovas
+---
+
+#### **Two-way Anovas**
 ```{r, echo = FALSE, eval = (both == 1)}
 # Serial accuracy ANOVA
-plot_STM <- readRDS("Outputs/analyses.RDS")$plot_STM
-anova2waySTM <- readRDS("Outputs/analyses.RDS")$anova2waySTM
-
 plot_STM
 anova2waySTM
 ```
 
+---
+
 ```{r, echo = FALSE, eval = (both == 1)}
 # Item scoring ANOVA
-plot_STM_i <- readRDS("Outputs/analyses.RDS")$plot_STM_i
-anova2waySTMitem <- readRDS("Outputs/analyses.RDS")$anova2waySTMitem
-
 plot_STM_i
 anova2waySTMitem
 ```
 
+---
+
 ```{r, echo = FALSE, eval = (both == 1)}
 # Serial accuracy ANOVA
-plot_STM_s <- readRDS("Outputs/analyses.RDS")$plot_STM_s
-anova2waySTMserial <- readRDS("Outputs/analyses.RDS")$anova2waySTMserial
-
 plot_STM_s
 anova2waySTMserial
 ```
 
+---
+
 
 ### LTM
-#### Relatedness effect
+#### **Relatedness effect**
 ```{r, echo = FALSE}
-mPlot_LTM <- readRDS("Outputs/analyses.RDS")$mPlot_LTM
 mPlot_LTM
 ```
 
-#### Two-way Anova
-```{r, echo = FALSE, eval = (both == 1)}
-plot_LTM <- readRDS("Outputs/analyses.RDS")$plot_LTM
-anova2wayLTM <- readRDS("Outputs/analyses.RDS")$anova2wayLTM
+---
 
+#### **Two-way Anova**
+```{r, echo = FALSE, eval = (both == 1)}
 plot_LTM
 anova2wayLTM
 ```
 
-### Individual Means
+---
+
+## Individual Performance
 ```{r, echo = FALSE}
-Subjects <- readRDS("Outputs/Subjects.RDS")
-print(Subjects, n = nrow(Subjects))
+kable(Subjects)
 ```

@@ -249,6 +249,7 @@ if (both == 1) {
     ggplot(aes(BlockCondition, mean)) +
     geom_line(aes(group=TypeSTM, color = TypeSTM), linewidth = 2) +
     geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = .1) +
+    scale_color_manual(values = c("#E15759", "#4E79A7")) +
     ggtitle("STM: raw accuracy") +
     ylim(limits)
   
@@ -256,6 +257,7 @@ if (both == 1) {
     ggplot(aes(BlockCondition, mean)) +
     geom_line(aes(group=TypeSTM, color = TypeSTM), linewidth = 2) +
     geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = .1) +
+    scale_color_manual(values = c("#E15759", "#4E79A7")) +
     ggtitle("STM: serial memory") +
     ylim(limits)
   
@@ -263,6 +265,7 @@ if (both == 1) {
     ggplot(aes(BlockCondition, mean)) +
     geom_line(aes(group=TypeSTM, color = TypeSTM), linewidth = 2) +
     geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = .1) +
+    scale_color_manual(values = c("#E15759", "#4E79A7")) +
     ggtitle("STM: item memory") +
     ylim(limits)
   
@@ -341,6 +344,7 @@ if (both == 1) {
     ggplot(aes(BlockCondition, mean)) +
     geom_line(aes(group=TypeLTM, color = TypeLTM), linewidth = 2) +
     geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = .1) +
+    scale_color_manual(values = c("#E15759", "#4E79A7")) +
     ggtitle("LTM: raw accuracy") +
     ylim(limits)
   
@@ -388,7 +392,7 @@ for (v in names(vars)) {
   saveRDS(vars[[v]], file = paste0("Outputs/", v, ".rds"))
 }
 
-rm(vars, config)
+rm(vars, config, analyses)
 
 
 # Run custom function
