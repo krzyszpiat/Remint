@@ -183,14 +183,17 @@ N = length(levels(table3$Subject))
 
 # Calculating mean accuracy for individual subjects
 Subjects <- table3 %>% 
-  group_by(Subject, ProlificNo) %>%
+  group_by(Subject, ProlificNo, check.RESP, BlockCondition) %>%
   summarise(LTM = mean(AccuracyLTM, na.rm = T),
             STM = mean(AccuracySTM, na.rm = T),
             STM_s = mean(AccuracySTMSerial, na.rm = T),
             STM_i = mean(AccuracySTMItem, na.rm = T)) %>% 
+  rename(honestyCheck = check.RESP) %>% 
   arrange(LTM)
 
-
+Nh <- sum(Subjects$honestyCheck == "y")
+Ns <- sum(Subjects$BlockCondition == "short")
+Nl <- sum(Subjects$BlockCondition == "long")
 
 #### STM: ANALYSES & PLOTS ####
 
@@ -401,7 +404,10 @@ mPlot_LTM <- LTMmeansGrouped %>%
 
 # Prepare info for the report
 config <- list(both = both, 
-               N = N)
+               N = N,
+               Nh = Nh,
+               Ns = Ns,
+               Nl = Nl)
 
 analyses <- list(
   plot_STM = plot_STM,

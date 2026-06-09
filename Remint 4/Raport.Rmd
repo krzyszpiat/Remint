@@ -12,13 +12,16 @@ output:
 library(knitr)
 library(dplyr)
 
-independent <- 0 # knitting without the main script? (1 = yes)
+independent <- 1 # knitting without the main script? (1 = yes)
 
 both <- readRDS("Outputs/config.RDS")$both
 ```
 
 ```{r data upload, echo = FALSE, eval = (independent == 1)}
 N <- readRDS("Outputs/config.RDS")$N
+Nh <- readRDS("Outputs/config.RDS")$Nh
+Ns <- readRDS("Outputs/config.RDS")$Ns
+Nl <- readRDS("Outputs/config.RDS")$Nl
 
 Subjects <- readRDS("Outputs/Subjects.RDS")
 
@@ -36,7 +39,9 @@ anova2wayLTM <- readRDS("Outputs/analyses.RDS")$anova2wayLTM
 
 ```
 
-#### Subjects: `r N`
+#### Subjects: `r paste0(N, " (read aloud: ", Nh, ")")`
+##### - Subjects in the SHORT condition: `r Ns`
+##### - Subjects in the LONG condition: `r Nl`
 
 #### Design:
 - Replikacja Remint1 z czterema zamiast dwoma dystraktorami.
@@ -105,5 +110,7 @@ anova2wayLTM
 
 ## Individual Performance
 ```{r, echo = FALSE}
-kable(Subjects)
+kable(Subjects %>% 
+        ungroup() %>% 
+        select(-c(honestyCheck, BlockCondition)))
 ```
