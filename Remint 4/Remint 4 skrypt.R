@@ -199,58 +199,100 @@ Nl <- sum(Subjects$BlockCondition == "long")
 
 # Calculating mean accuracy by condition for individual subjects
 tableSTM <- table3 %>% 
-  select(Subject, BlockCondition, TypeSTM, AccuracySTM, AccuracySTMSerial, AccuracySTMItem) %>% 
+  select(Subject, BlockCondition, TypeSTM, AccuracySTM, AccuracySTMSerial, AccuracySTMItem, check.RESP) %>% 
   filter(!is.na(TypeSTM)) %>% 
-  group_by(Subject, BlockCondition, TypeSTM) %>% 
+  group_by(Subject, BlockCondition, TypeSTM, check.RESP) %>% 
   summarise(meanAccuracy = mean(AccuracySTM),
             meanSerial = mean(AccuracySTMSerial),
             meanItem = mean(AccuracySTMItem)) %>% 
   ungroup()
 
+tableSTM_h <- tableSTM %>% filter(check.RESP == "y")
+
 
 # Calculating mean accuracy by condition for the whole sample
-STMmeans <- tableSTM %>% 
-  group_by(BlockCondition, TypeSTM) %>% 
-  summarise(mean = mean(meanAccuracy, na.rm = T),
-            sd = sd(meanAccuracy),
-            se = sd/sqrt(N-1))
 
-STMmeansGrouped <- tableSTM %>% 
-  group_by(TypeSTM) %>% 
-  summarise(mean = mean(meanAccuracy, na.rm = T),
-            sd = sd(meanAccuracy),
-            se = sd/sqrt(N-1))
+## Function for generating tables for the plots
+stmTables <- function(data, type = "raw", grouped = FALSE) {
+  
+  dv <- case_when(
+    type == "raw" ~  "meanAccuracy",
+    type == "item" ~ "meanItem",
+    type == "serial" ~ "meanSerial"
+  )
+  
+  if (grouped) {
+    
+    df <- data %>% 
+      group_by(TypeSTM) %>% 
+      summarise(mean = mean(.data[[dv]], na.rm = T),
+                sd = sd(.data[[dv]]),
+                se = sd/sqrt(N-1))
+    
+  } else {
+  
+    df <- data %>% 
+      group_by(BlockCondition, TypeSTM) %>% 
+      summarise(mean = mean(.data[[dv]], na.rm = T),
+                sd = sd(.data[[dv]]),
+                se = sd/sqrt(N-1))  
+    
+  }
+  
+  return(df)
+  
+}
+
+STMmeans <- stmTables(tableSTM, type = "raw", grouped = F)
+STMmeansGrouped <- stmTables(tableSTM, type = "raw", grouped = T)
+
+  STMmeans_h <- stmTables(tableSTM_h, type = "raw", grouped = F)
+  STMmeansGrouped_h <- stmTables(tableSTM_h, type = "raw", grouped = T)
 
 
-STMmeans_i <- tableSTM %>% 
-  group_by(BlockCondition, TypeSTM) %>% 
-  summarise(mean = mean(meanItem, na.rm = T),
-            sd = sd(meanItem),
-            se = sd/sqrt(N-1))
 
-STMmeansGrouped_i <- tableSTM %>% 
-  group_by(TypeSTM) %>% 
-  summarise(mean = mean(meanItem, na.rm = T),
-            sd = sd(meanItem),
-            se = sd/sqrt(N-1))
+STMmeans_i <- stmTables(tableSTM, type = "item", grouped = F)
+STMmeansGrouped_i <- stmTables(tableSTM, type = "item", grouped = T)
 
-STMmeans_s <- tableSTM %>% 
-  group_by(BlockCondition, TypeSTM) %>% 
-  summarise(mean = mean(meanSerial, na.rm = T),
-            sd = sd(meanSerial),
-            se = sd/sqrt(N-1))
+  STMmeans_i_h <- stmTables(tableSTM_h, type = "item", grouped = F)
+  STMmeansGrouped_i_h <- stmTables(tableSTM_h, type = "item", grouped = T)
 
-STMmeansGrouped_s <- tableSTM %>% 
-  group_by(TypeSTM) %>% 
-  summarise(mean = mean(meanSerial, na.rm = T),
-            sd = sd(meanSerial),
-            se = sd/sqrt(N-1))
+  
+  
+STMmeans_s <- stmTables(tableSTM, type = "serial", grouped = F)
+STMmeansGrouped_s <- stmTables(tableSTM, type = "serial", grouped = T)
+  
+  STMmeans_s_h <- stmTables(tableSTM_h, type = "serial", grouped = F)
+  STMmeansGrouped_s_h <- stmTables(tableSTM_h, type = "serial", grouped = T)
 
+
+# Set the y-axis limits for all plots
 limits <- c(0,1)
 
 
 if (both == 1) {
   
+  # Function comparing anova outputs
+  anovaDiffs <- function(anova1, anova2){
+    
+    t1 <- anova1$`p<.05`
+    t2 <- anova2$`p<.05`
+    
+    diff <- t1 != t2
+    
+    if (sum(diff) > 0) {
+      
+      return("difference")
+      
+    }else{
+      
+      return("no difference")
+      
+    }
+    
+  }
+  
+
   # 2-way anova: raw accuracy
   anova2waySTM <- anova_test(tableSTM, 
                              dv = meanAccuracy, 
@@ -258,6 +300,15 @@ if (both == 1) {
                              within = TypeSTM,
                              between = BlockCondition)
   
+  # 2-way anova: raw accuracy (only speaking out-loud)
+  anova2waySTM_h <- anova_test(tableSTM_h, 
+                             dv = meanAccuracy, 
+                             wid = Subject, 
+                             within = TypeSTM,
+                             between = BlockCondition)
+  
+  STMraw_comp <- anovaDiffs(anova2waySTM, anova2waySTM_h)
+
   
   # 2-way anova: serial memory
   anova2waySTMserial <- anova_test(tableSTM, 
@@ -266,12 +317,31 @@ if (both == 1) {
                                    within = TypeSTM,
                                    between = BlockCondition)
   
+  # 2-way anova: serial memory (only speaking out-loud)
+  anova2waySTMserial_h <- anova_test(tableSTM_h, 
+                                   dv = meanSerial, 
+                                   wid = Subject, 
+                                   within = TypeSTM,
+                                   between = BlockCondition)
+  
+  STMserial_comp <- anovaDiffs(anova2waySTMserial, anova2waySTMserial_h)
+
+  
   # 2-way anova: item memory
   anova2waySTMitem <- anova_test(tableSTM, 
                                  dv = meanItem, 
                                  wid = Subject, 
                                  within = TypeSTM,
                                  between = BlockCondition)
+  
+  # 2-way anova: item memory (only speaking out-loud)
+  anova2waySTMitem_h <- anova_test(tableSTM_h, 
+                                 dv = meanItem, 
+                                 wid = Subject, 
+                                 within = TypeSTM,
+                                 between = BlockCondition)
+  
+  STMitem_comp <- anovaDiffs(anova2waySTMitem, anova2waySTMitem_h)
 
   # Generating plots
   plot_STM <- STMmeans %>% 
@@ -407,7 +477,10 @@ config <- list(both = both,
                N = N,
                Nh = Nh,
                Ns = Ns,
-               Nl = Nl)
+               Nl = Nl,
+               STMraw_comp = STMraw_comp,
+               STMitem_comp = STMitem_comp,
+               STMserial_comp = STMserial_comp)
 
 analyses <- list(
   plot_STM = plot_STM,

@@ -12,7 +12,7 @@ output:
 library(knitr)
 library(dplyr)
 
-independent <- 1 # knitting without the main script? (1 = yes)
+independent <- 0 # knitting without the main script? (1 = yes)
 
 both <- readRDS("Outputs/config.RDS")$both
 ```
@@ -71,6 +71,12 @@ mPlot_STM
 # Serial accuracy ANOVA
 plot_STM
 anova2waySTM
+
+if (readRDS("Outputs/config.RDS")$STMraw_comp == "difference") {
+  
+  cat("THERE IS A DIFFERENCE BETWEEN UNFILTERED AND FILTERED DATA")
+  
+}
 ```
 
 ---
@@ -79,6 +85,12 @@ anova2waySTM
 # Item scoring ANOVA
 plot_STM_i
 anova2waySTMitem
+
+if (readRDS("Outputs/config.RDS")$STMitem_comp == "difference") {
+  
+  cat("THERE IS A DIFFERENCE BETWEEN UNFILTERED AND FILTERED DATA")
+  
+}
 ```
 
 ---
@@ -87,6 +99,12 @@ anova2waySTMitem
 # Serial accuracy ANOVA
 plot_STM_s
 anova2waySTMserial
+
+if (readRDS("Outputs/config.RDS")$STMserial_comp == "difference") {
+  
+  cat("THERE IS A DIFFERENCE BETWEEN UNFILTERED AND FILTERED DATA")
+  
+}
 ```
 
 ---
